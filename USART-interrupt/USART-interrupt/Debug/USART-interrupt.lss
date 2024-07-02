@@ -1,0 +1,257 @@
+
+USART-interrupt.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000174  00000000  00000000  00000094  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         0000000c  00800060  00000174  00000208  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .bss          0000000e  0080006c  0080006c  00000214  2**0
+                  ALLOC
+  3 .comment      00000030  00000000  00000000  00000214  2**0
+                  CONTENTS, READONLY
+  4 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000244  2**2
+                  CONTENTS, READONLY
+  5 .debug_aranges 00000030  00000000  00000000  00000280  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_info   000006f0  00000000  00000000  000002b0  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_abbrev 000005fd  00000000  00000000  000009a0  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_line   000002c5  00000000  00000000  00000f9d  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_frame  00000064  00000000  00000000  00001264  2**2
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_str    0000037b  00000000  00000000  000012c8  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_loc    000000d1  00000000  00000000  00001643  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 12 .debug_ranges 00000020  00000000  00000000  00001714  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+   8:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+   c:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  10:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  14:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  18:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  1c:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  20:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  24:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  28:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  2c:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  30:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  34:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  38:	0c 94 7a 00 	jmp	0xf4	; 0xf4 <__vector_14>
+  3c:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  40:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  44:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  48:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  4c:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  50:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d8 e0       	ldi	r29, 0x08	; 8
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+
+00000060 <__do_copy_data>:
+  60:	10 e0       	ldi	r17, 0x00	; 0
+  62:	a0 e6       	ldi	r26, 0x60	; 96
+  64:	b0 e0       	ldi	r27, 0x00	; 0
+  66:	e4 e7       	ldi	r30, 0x74	; 116
+  68:	f1 e0       	ldi	r31, 0x01	; 1
+  6a:	02 c0       	rjmp	.+4      	; 0x70 <__do_copy_data+0x10>
+  6c:	05 90       	lpm	r0, Z+
+  6e:	0d 92       	st	X+, r0
+  70:	ac 36       	cpi	r26, 0x6C	; 108
+  72:	b1 07       	cpc	r27, r17
+  74:	d9 f7       	brne	.-10     	; 0x6c <__do_copy_data+0xc>
+
+00000076 <__do_clear_bss>:
+  76:	20 e0       	ldi	r18, 0x00	; 0
+  78:	ac e6       	ldi	r26, 0x6C	; 108
+  7a:	b0 e0       	ldi	r27, 0x00	; 0
+  7c:	01 c0       	rjmp	.+2      	; 0x80 <.do_clear_bss_start>
+
+0000007e <.do_clear_bss_loop>:
+  7e:	1d 92       	st	X+, r1
+
+00000080 <.do_clear_bss_start>:
+  80:	aa 37       	cpi	r26, 0x7A	; 122
+  82:	b2 07       	cpc	r27, r18
+  84:	e1 f7       	brne	.-8      	; 0x7e <.do_clear_bss_loop>
+  86:	0e 94 54 00 	call	0xa8	; 0xa8 <main>
+  8a:	0c 94 b8 00 	jmp	0x170	; 0x170 <_exit>
+
+0000008e <__bad_interrupt>:
+  8e:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+00000092 <USART_Init>:
+/* example, 2400bauds=25                                                                    */
+/************************************************************************/
+void USART_Init (unsigned int baud)
+{
+	//Expliciter l'utilisation du registre UBBRH avant operation d'écriture sur UBBRH
+	UBRRH &= ~(1 << URSEL);
+  92:	20 b5       	in	r18, 0x20	; 32
+  94:	2f 77       	andi	r18, 0x7F	; 127
+  96:	20 bd       	out	0x20, r18	; 32
+	//Partie MSB du registre HAUT (bits 8 to 11)
+	UBRRH = (unsigned char) (baud >> 8);
+  98:	90 bd       	out	0x20, r25	; 32
+	//Partie LSB du registre BAS (bits 0 ? 7)
+	UBRRL = (unsigned char) baud;
+  9a:	89 b9       	out	0x09, r24	; 9
+
+	//Enable the receiver and transmitter
+	UCSRB = (1 << RXEN) | (1 << TXEN);
+  9c:	88 e1       	ldi	r24, 0x18	; 24
+  9e:	8a b9       	out	0x0a, r24	; 10
+
+	//Expliciter l'utilisation du registre UCSRC avant operation d'?criture sur UBBRH
+	//Set enable EVEN PARITY
+	//Set 1 stop bits and data bit length is 8-bit
+	UCSRC = (1<<URSEL)| (1<<UPM1)|(3 << UCSZ0);
+  a0:	86 ea       	ldi	r24, 0xA6	; 166
+  a2:	80 bd       	out	0x20, r24	; 32
+	
+	//activation d'interruption
+	sei();//activation du registre d'interruption global.	
+  a4:	78 94       	sei
+  a6:	08 95       	ret
+
+000000a8 <main>:
+
+
+int main(void)
+{
+    // initialiser la communication serial
+	USART_Init(25);
+  a8:	89 e1       	ldi	r24, 0x19	; 25
+  aa:	90 e0       	ldi	r25, 0x00	; 0
+  ac:	0e 94 49 00 	call	0x92	; 0x92 <USART_Init>
+	//Enable interrupt
+    while (1) 
+    {
+		while( isBlock == VRAI ){}
+  b0:	80 91 6e 00 	lds	r24, 0x006E	; 0x80006e <isBlock>
+  b4:	90 91 6f 00 	lds	r25, 0x006F	; 0x80006f <isBlock+0x1>
+  b8:	01 97       	sbiw	r24, 0x01	; 1
+  ba:	d1 f3       	breq	.-12     	; 0xb0 <main+0x8>
+		isBlock = VRAI; //bloquer le main
+  bc:	81 e0       	ldi	r24, 0x01	; 1
+  be:	90 e0       	ldi	r25, 0x00	; 0
+  c0:	90 93 6f 00 	sts	0x006F, r25	; 0x80006f <isBlock+0x1>
+  c4:	80 93 6e 00 	sts	0x006E, r24	; 0x80006e <isBlock>
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+  c8:	2f e9       	ldi	r18, 0x9F	; 159
+  ca:	86 e8       	ldi	r24, 0x86	; 134
+  cc:	91 e0       	ldi	r25, 0x01	; 1
+  ce:	21 50       	subi	r18, 0x01	; 1
+  d0:	80 40       	sbci	r24, 0x00	; 0
+  d2:	90 40       	sbci	r25, 0x00	; 0
+  d4:	e1 f7       	brne	.-8      	; 0xce <main+0x26>
+  d6:	00 c0       	rjmp	.+0      	; 0xd8 <main+0x30>
+  d8:	00 00       	nop
+		_delay_ms(500);
+		sprintf(buffer, "MATHILDE\r\n");
+  da:	8b e0       	ldi	r24, 0x0B	; 11
+  dc:	e0 e6       	ldi	r30, 0x60	; 96
+  de:	f0 e0       	ldi	r31, 0x00	; 0
+  e0:	a0 e7       	ldi	r26, 0x70	; 112
+  e2:	b0 e0       	ldi	r27, 0x00	; 0
+  e4:	01 90       	ld	r0, Z+
+  e6:	0d 92       	st	X+, r0
+  e8:	8a 95       	dec	r24
+  ea:	e1 f7       	brne	.-8      	; 0xe4 <main+0x3c>
+		UCSRB |= (1 << UDRIE);	
+  ec:	8a b1       	in	r24, 0x0a	; 10
+  ee:	80 62       	ori	r24, 0x20	; 32
+  f0:	8a b9       	out	0x0a, r24	; 10
+    }
+  f2:	de cf       	rjmp	.-68     	; 0xb0 <main+0x8>
+
+000000f4 <__vector_14>:
+}
+
+
+
+//Interruption active lorsque le microcontroleur et pret à transmetre  de données via UDR
+ISR(USART_UDRE_vect){
+  f4:	1f 92       	push	r1
+  f6:	0f 92       	push	r0
+  f8:	0f b6       	in	r0, 0x3f	; 63
+  fa:	0f 92       	push	r0
+  fc:	11 24       	eor	r1, r1
+  fe:	8f 93       	push	r24
+ 100:	9f 93       	push	r25
+ 102:	ef 93       	push	r30
+ 104:	ff 93       	push	r31
+		if(index < 10 && buffer[index] != '\0'){
+ 106:	80 91 6c 00 	lds	r24, 0x006C	; 0x80006c <__data_end>
+ 10a:	90 91 6d 00 	lds	r25, 0x006D	; 0x80006d <__data_end+0x1>
+ 10e:	0a 97       	sbiw	r24, 0x0a	; 10
+ 110:	dc f4       	brge	.+54     	; 0x148 <__vector_14+0x54>
+ 112:	e0 91 6c 00 	lds	r30, 0x006C	; 0x80006c <__data_end>
+ 116:	f0 91 6d 00 	lds	r31, 0x006D	; 0x80006d <__data_end+0x1>
+ 11a:	e0 59       	subi	r30, 0x90	; 144
+ 11c:	ff 4f       	sbci	r31, 0xFF	; 255
+ 11e:	80 81       	ld	r24, Z
+ 120:	88 23       	and	r24, r24
+ 122:	91 f0       	breq	.+36     	; 0x148 <__vector_14+0x54>
+			UDR = buffer[index];
+ 124:	e0 91 6c 00 	lds	r30, 0x006C	; 0x80006c <__data_end>
+ 128:	f0 91 6d 00 	lds	r31, 0x006D	; 0x80006d <__data_end+0x1>
+ 12c:	e0 59       	subi	r30, 0x90	; 144
+ 12e:	ff 4f       	sbci	r31, 0xFF	; 255
+ 130:	80 81       	ld	r24, Z
+ 132:	8c b9       	out	0x0c, r24	; 12
+			index++;
+ 134:	80 91 6c 00 	lds	r24, 0x006C	; 0x80006c <__data_end>
+ 138:	90 91 6d 00 	lds	r25, 0x006D	; 0x80006d <__data_end+0x1>
+ 13c:	01 96       	adiw	r24, 0x01	; 1
+ 13e:	90 93 6d 00 	sts	0x006D, r25	; 0x80006d <__data_end+0x1>
+ 142:	80 93 6c 00 	sts	0x006C, r24	; 0x80006c <__data_end>
+ 146:	0b c0       	rjmp	.+22     	; 0x15e <__vector_14+0x6a>
+		}else{
+			UCSRB &= ~(1 << UDRIE); 	//désactiver l'interruption UDRE
+ 148:	8a b1       	in	r24, 0x0a	; 10
+ 14a:	8f 7d       	andi	r24, 0xDF	; 223
+ 14c:	8a b9       	out	0x0a, r24	; 10
+			index = 0;
+ 14e:	10 92 6d 00 	sts	0x006D, r1	; 0x80006d <__data_end+0x1>
+ 152:	10 92 6c 00 	sts	0x006C, r1	; 0x80006c <__data_end>
+			isBlock = FAUX;
+ 156:	10 92 6f 00 	sts	0x006F, r1	; 0x80006f <isBlock+0x1>
+ 15a:	10 92 6e 00 	sts	0x006E, r1	; 0x80006e <isBlock>
+		}
+}
+ 15e:	ff 91       	pop	r31
+ 160:	ef 91       	pop	r30
+ 162:	9f 91       	pop	r25
+ 164:	8f 91       	pop	r24
+ 166:	0f 90       	pop	r0
+ 168:	0f be       	out	0x3f, r0	; 63
+ 16a:	0f 90       	pop	r0
+ 16c:	1f 90       	pop	r1
+ 16e:	18 95       	reti
+
+00000170 <_exit>:
+ 170:	f8 94       	cli
+
+00000172 <__stop_program>:
+ 172:	ff cf       	rjmp	.-2      	; 0x172 <__stop_program>
