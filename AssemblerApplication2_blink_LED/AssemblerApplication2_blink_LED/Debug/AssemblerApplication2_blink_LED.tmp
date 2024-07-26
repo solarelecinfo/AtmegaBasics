@@ -1,0 +1,28 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.2.8</VERSION>
+ <DEVICE>"ATmega32"</DEVICE>
+ <WORKING_DIR>C:\Users\jctor\Documents\Atmel Studio\7.0\AssemblerApplication2_blink_LED\AssemblerApplication2_blink_LED\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc</DIR>
+  <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>C:\Users\jctor\Documents\Atmel Studio\7.0\AssemblerApplication2_blink_LED\AssemblerApplication2_blink_LED\main.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m32def.inc</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>C:\Users\jctor\Documents\Atmel Studio\7.0\AssemblerApplication2_blink_LED\AssemblerApplication2_blink_LED\Debug\AssemblerApplication2_blink_LED.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>AssemblerApplication2_blink_LED.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>AssemblerApplication2_blink_LED.map</FILE>
+  <FILE>AssemblerApplication2_blink_LED.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <repeat><FILE>C:\Users\jctor\Documents\Atmel Studio\7.0\AssemblerApplication2_blink_LED\AssemblerApplication2_blink_LED\main.asm</FILE><LINE>26</LINE></repeat>
+  <fritter><FILE>C:\Users\jctor\Documents\Atmel Studio\7.0\AssemblerApplication2_blink_LED\AssemblerApplication2_blink_LED\main.asm</FILE><LINE>41</LINE></fritter>
+ </LABELS>
+</ASSEMBLER_INFO>
