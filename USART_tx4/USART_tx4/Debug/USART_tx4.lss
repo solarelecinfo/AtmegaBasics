@@ -23,11 +23,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   9 .debug_frame  00000098  00000000  00000000  00001438  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    000003bb  00000000  00000000  000014d0  2**0
+ 10 .debug_str    000003c2  00000000  00000000  000014d0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00000202  00000000  00000000  0000188b  2**0
+ 11 .debug_loc    00000202  00000000  00000000  00001892  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000030  00000000  00000000  00001a8d  2**0
+ 12 .debug_ranges 00000030  00000000  00000000  00001a94  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -206,15 +206,15 @@ ISR(USART_RXC_vect) {
  156:	ff 93       	push	r31
     // Cette ISR est appelée lorsqu'un octet est reçu
     recieved_char_table[global_index] = UDR;
- 158:	e0 91 60 00 	lds	r30, 0x0060	; 0x800060 <__DATA_REGION_ORIGIN__>
- 15c:	f0 91 61 00 	lds	r31, 0x0061	; 0x800061 <__DATA_REGION_ORIGIN__+0x1>
+ 158:	e0 91 60 00 	lds	r30, 0x0060	; 0x800060 <__data_end>
+ 15c:	f0 91 61 00 	lds	r31, 0x0061	; 0x800061 <__data_end+0x1>
  160:	8c b1       	in	r24, 0x0c	; 12
  162:	ee 59       	subi	r30, 0x9E	; 158
  164:	ff 4f       	sbci	r31, 0xFF	; 255
  166:	80 83       	st	Z, r24
 	global_index = ((global_index + 1) % 4);
- 168:	80 91 60 00 	lds	r24, 0x0060	; 0x800060 <__DATA_REGION_ORIGIN__>
- 16c:	90 91 61 00 	lds	r25, 0x0061	; 0x800061 <__DATA_REGION_ORIGIN__+0x1>
+ 168:	80 91 60 00 	lds	r24, 0x0060	; 0x800060 <__data_end>
+ 16c:	90 91 61 00 	lds	r25, 0x0061	; 0x800061 <__data_end+0x1>
  170:	01 96       	adiw	r24, 0x01	; 1
  172:	83 70       	andi	r24, 0x03	; 3
  174:	90 78       	andi	r25, 0x80	; 128
@@ -224,8 +224,8 @@ ISR(USART_RXC_vect) {
  17c:	8c 6f       	ori	r24, 0xFC	; 252
  17e:	9f 6f       	ori	r25, 0xFF	; 255
  180:	01 96       	adiw	r24, 0x01	; 1
- 182:	90 93 61 00 	sts	0x0061, r25	; 0x800061 <__DATA_REGION_ORIGIN__+0x1>
- 186:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <__DATA_REGION_ORIGIN__>
+ 182:	90 93 61 00 	sts	0x0061, r25	; 0x800061 <__data_end+0x1>
+ 186:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <__data_end>
     // Traitez l'octet reçu (stockez-le, envoyez-le sur une interface de communication, etc.)
 	
 }
