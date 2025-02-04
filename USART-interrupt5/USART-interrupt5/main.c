@@ -10,12 +10,11 @@
 typedef int BOOLEAN;
 
 volatile unsigned int increment = 0;
-volatile unsigned int compteur = 0;
-volatile BOOLEAN isBlock = FAUX; //VRAI= blocs Data reception ISR on microcontroller.
+volatile BOOLEAN isMainFlowBlock = FAUX; //VRAI= blocs Data reception ISR on microcontroller.
 volatile BOOLEAN isCounterBlock = FAUX; 
 volatile int tx_read_index = 0;
-volatile int index = 0;
-char buffer[10];
+volatile int position = 0;
+char buffer[30];
 int status=0;
 
 void init_usart(unsigned int);
@@ -24,84 +23,84 @@ void init_timer0(void);
 int main(void)
 {
 	int counter=0;
-	init_usart(25);//Enable usart at 2400bauds/s
+	init_usart(25);//Enable USART rate of 2400 baud
 	init_timer0();//Enable TIMER0 interrupt with 1MHZ internal clock
     while (1) 
     {
-		while( isBlock == VRAI || isCounterBlock == VRAI){}
-		isBlock = VRAI; 
-		snprintf(buffer, sizeof(buffer), "MATHILDE etat led ====%d status=%d \r\n", counter, status);
-		counter=((counter+1)%125);
-		UCSRB |= (1 << UDRIE);	//activer interruption ISR pour transmettre des bytes(USART_UDRE_vect)
+		while( isMainFlowBlock == VRAI || isCounterBlock == VRAI){}
+		isMainFlowBlock = VRAI; 
+		snprintf(buffer, sizeof(buffer), "count=%d led_status =%d \r\n", counter, status);
+		counter = ((counter+1) % 125);
+		UCSRB |= (1 << UDRIE);	//active ISR for serial data sending(USART_UDRE_vect)
     }
 }
 
-/************************************************************************/
-/* Description: permet d'initialiser les registres du module USART en mode asychrone
-/* baud: valeur entier en ?criture sur les deux registres UBBR correspondant ? la vitesse en baud(bits/s)  
-/* example, 2400bauds=25                                                                    */
-/************************************************************************/
+/*******************************************************************************************************/
+/* Description: Initializes the registers of the USART module in asynchronous mode.
+/* baud: Integer value written to both UBBR registers corresponding to the baud rate (bits per second).
+/* Example: 2400 baud = 25                                                               */
+/*******************************************************************************************************/
 void init_usart(unsigned int baud)
 {
-	//Specify the use of register UBBRH before start writting on UBBRH
+	//Select register UBBR before start writing on UBBRH
 	UBRRH &= ~(1 << URSEL);
-	//MSB Part of register HIGH (bits 8 to 11)
+	//MSB(HIGH) Part of register(bits 8 to 11)
 	UBRRH = (unsigned char) (baud >> 8);
-	//Partie LSB du registre BAS (bits 0 ? 7)
+	//LSB(LOW) Part of register (bits 0 to 7)
 	UBRRL = (unsigned char) baud;
 
-	//Enable the receiver and transmitter
-	UCSRB = (1 << RXEN) | (1 << TXEN);
+	//Enable only transmiter module
+	UCSRB = (1 << TXEN) ;
 
-	//Expliciter l'utilisation du registre UCSRC avant operation d'?criture sur UBBRH
-	//Set enable EVEN PARITY
-	//Set 1 stop bits and data bit length is 8-bit
+	//Select register UCSR before writing on UBBRH
+	//Set Parity=even ,Set stop bit=1 and total data bit length = 8
 	UCSRC = (1<<URSEL)| (1<<UPM1)|(3 << UCSZ0);
 	
-	//activation d'interruption
-	sei();//activation du registre d'interruption global.	
-}
-
-
-//Interruption active lorsque le microcontroleur et pret à transmetre  de données via UDR
-ISR(USART_UDRE_vect){
-		if(buffer[index] != '\0'){
-			UDR = buffer[index];
-			index++;
-		}else{
-			UCSRB &= ~(1 << UDRIE); 	//désactiver l'interruption UDRE
-			index = 0;
-			isBlock = FAUX;
-		}
+	sei();//activate global interrupts	
 }
 
 void init_timer0(){
-	//PORTC CONFIGURATION SPECIAL PINB3 en sortie OC0(signal du compteur) 
 	DDRC =0x01; /* 0b00000001//PINC0 as OUTPUT*/
-	PORTC = 0b00000000; /*initial state of pins as output*/
-	asm( "nop ");
+	PORTC = 0b00000000; /*initial state of pin as output*/
 	
-		//TIMER CONFIGURATION
-	TCCR0 |= (1<<WGM01); //configurer le mode du timer en CTC valeur max du compteur customisable 
-	TCCR0 |= (1<<COM00); //configurer le pin OC0 de seuil de comptage en mode TOGGLE ? chaque MAX_TOP
-	TCCR0 |= (1<<CS02)|(1<<CS00); //configurer prescalaire du 8 bit compteur0 en 1MHZ/1024
+	//TIMER CONFIGURATION
+	TCCR0 |= (1<<WGM01); //Configure the timer mode in CTC (Clear Timer on Compare Match), allowing a customizable max count value.
+	TCCR0 |= (1<<COM00); //Configure the OC0 pin to toggle on each MAX_TOP value.
+	TCCR0 |= (1<<CS02)|(1<<CS00);//Set the prescaler for the 8-bit timer to 1MHz / 1024.
 	
-	OCR0 = 244;//MAX_TOP customisable counter value
+	OCR0 = 244;//MAX_TOP counter value
 	
 	//INTERRUPT
 	sei();
-	TIMSK |= (1<<OCIE0);
-	TIFR |= (1<<OCF0);
+	TIMSK |= (1<<OCIE0); //Enable ISR for Timer Compare Match
 }
 
+
+/***************************************************************************************************************/
+/* Description: Interruption called whenever DATA is ready to be sent via TX cable and interruption flag was set                                                            */
+/***************************************************************************************************************/
+ISR(USART_UDRE_vect){
+		if( buffer[ position ] != '\0' && position < sizeof(buffer)/sizeof(char) ){
+			UDR = buffer[ position ];
+			position++;
+		}else{
+			UCSRB &= ~(1 << UDRIE); 	//Make sure to disable interruption when done sending data(message)
+			position = 0;
+			isMainFlowBlock = FAUX;
+		}
+}
+
+/***************************************************************************************************************/
+/* Description: Interruption called whenever a compare match(CTC) is reached by timer                                                         */
+/***************************************************************************************************************/
 ISR(TIMER0_COMP_vect){
 	increment++;
 	if(increment >4){
 		PORTC ^= (1<<PORTC0);
 		increment = 0;
-		isCounterBlock=FAUX;
-		status = PORTC;
+		isCounterBlock = FAUX;
+		status = PORTC & 0x01;
 	}else{
-		isCounterBlock=VRAI;
+		isCounterBlock = VRAI;
 	}
 }
