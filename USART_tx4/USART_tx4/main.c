@@ -39,12 +39,12 @@ unsigned int counter=0;
 
 /************************************************************************/
 /* Description: permet d'initialiser les registres du module USART en mode asychrone
-/* baud: valeur entier en ?criture sur les deux registres UBBR correspondant ? la vitesse en baud(bits/s)  
+/* baud: valeur entier en écriture sur les deux registres UBBR correspondant à la vitesse en baud(bits/s)  
 /* example, 2400bauds=25                                                                    */
 /************************************************************************/
 void USART_Init (unsigned int baud)
 {
-	//Expliciter l'utilisation du registre UBBRH avant operation d'?criture sur UBBRH
+	//Expliciter l'utilisation du registre UBBRH avant operation d'écriture sur UBBRH
 	UBRRH &= ~(1 << URSEL);
 	//Partie MSB du registre HAUT (bits 8 to 11)
 	UBRRH = (unsigned char) (baud >> 8);
