@@ -33,7 +33,6 @@ int main(void)
 	}
 }
 
-
 /***************************************************************************************************************/
 /* Description: Initializes the registers of the USART module in asynchronous mode.
 /* baud: Integer value written to both UBBR registers corresponding to the baud rate (bits per second).
@@ -57,6 +56,9 @@ void init_usart(unsigned int baud)
 	sei();//activate global interrupts
 }
 
+/***************************************************************************************************************/
+/* Description: Initializes 8 bit timer                                                           */
+/**************************************************************************************************************/
 void init_timer0(){
 	DDRC =0x01; /* 0b00000001//PINC0 as OUTPUT*/
 	PORTC = 0b00000000; /*initial state of pin as output*/
@@ -75,20 +77,20 @@ void init_timer0(){
 /* Description: Interruption called whenever DATA is ready to be sent via TX cable and interruption flag was set                                                            */
 /***************************************************************************************************************/
 ISR(USART_UDRE_vect){
-if( buffer[ position ] != '\0' && position < sizeof(buffer)/sizeof(char) ){
-UDR = buffer[ position ];
-position++;
-}else{
-UCSRB &= ~(1 << UDRIE); 	//Make sure to disable interruption when done sending data(message)
-position = 0;
-isMainFlowBlock = FAUX;
-}
+	if( buffer[ position ] != '\0' && position < sizeof(buffer)/sizeof(char) ){
+		UDR = buffer[ position ];
+		position++;
+	}else{
+		UCSRB &= ~(1 << UDRIE); 	//Make sure to disable interruption when done sending data(message)
+		position = 0;
+		isMainFlowBlock = FAUX;
+	}
 }
 
 /***************************************************************************************************************/
 /* Description: Interruption called whenever a compare match(CTC) MAX COUNT is reached by timer                                                         */
 /***************************************************************************************************************/
 ISR(TIMER0_COMP_vect){
-		PORTC ^= ( 1 << PORTC0); 
+		PORTC ^= ( 1 << PINC0); 
 		status = PORTC & 0x01;
 }
