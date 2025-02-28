@@ -13,10 +13,10 @@ int main(void){
 	setupGPIO();
 	setupTimer();
 	while(1){
-		if ( TCNT1 > 15624 ){
-			PORTC = 0x01; //LED ON
+		if ( !(TCNT1 % 7810) ){
+			PORTB ^= 0x01; //LED ON
 		}else{
-			PORTC = 0x00; //LED OFF
+			//PORTB = 0x00; //LED OFF
 		}
 	}
 return 0;
@@ -25,16 +25,17 @@ return 0;
 
 /** Configuration PORTC en sortie **/
 void setupGPIO(){
-	DDRC |= 0x01;
-	PORTC = 0x00;
+	DDRB |= 0x01;
+	PORTB = 0x00;
+	
+
 }
 
 /**	Configuration TIMER1 (16Bit)=65536 **/
 void setupTimer(){
-	DDRD |= (1 << PIND5); //PIN OC1A en OUTPUT
 	TCCR1A |= (1 << COM1A0); //Sortie PIN OC1A en mode Bascule ON/OFF .   
 	TCCR1B |= (1 << WGM12); //Fixer Mode CTC en interne et le signal de sortie.
 	TCCR1B |= (1 << CS11) | ( 1<< CS10); //Config prescalaire en 1MHZ/64 = 15625Hz
-	OCR1A = 31248; //Seuil comptage MAX_TOP=2s=2x(MAX-1)
+	OCR1A = 31250; //Seuil comptage MAX_TOP=2s=2x(MAX-1)
 }
 

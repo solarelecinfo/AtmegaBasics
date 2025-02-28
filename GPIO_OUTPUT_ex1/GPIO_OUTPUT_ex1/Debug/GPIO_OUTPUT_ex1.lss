@@ -66,30 +66,30 @@ Disassembly of section .text:
 
 0000006c <setup>:
 /**
-Description : initialisation des registres GPIO en sortie et en entrée
+To initialize GPIO PINs as either INPUT PULL UP or OUTPUT.
 **/
 void setup(){
-	// Initialisation de l'entrée
-	DDRC &= ~(1 << PINC7); // Configurer PINC7 comme entrée
+	//Input
+	DDRC &= ~(1 << PINC7);
   6c:	84 b3       	in	r24, 0x14	; 20
   6e:	8f 77       	andi	r24, 0x7F	; 127
   70:	84 bb       	out	0x14, r24	; 20
-	PORTC = 0b10000000; // Configurer l'entrée PINC7 en mode PULL-UP (5V sont mis en sortie lorsqu'elle est inactive)
+	PORTC = 0b10000000; // Configure PINC7 as input PULL UP (5V if inactive)
   72:	80 e8       	ldi	r24, 0x80	; 128
   74:	85 bb       	out	0x15, r24	; 21
 		
-	// Initialisation de la sortie
-	DDRB |= (1 << PINB1) | (1 << PINB0);// Configurer PINB2 et PINB3 comme sorties
+	//Output
+	DDRB |= (1 << PINB1) | (1 << PINB0);
   76:	87 b3       	in	r24, 0x17	; 23
   78:	83 60       	ori	r24, 0x03	; 3
   7a:	87 bb       	out	0x17, r24	; 23
-	PORTB &= 0b00000000; // Forcer l'état initial du port à zéro
+	PORTB &= 0b00000000; //Force all output to zero .
   7c:	88 b3       	in	r24, 0x18	; 24
   7e:	18 ba       	out	0x18, r1	; 24
   80:	08 95       	ret
 
 00000082 <main>:
-Le programme implémente le bouton PC7, permettant de générer un nombre aléatoire de transitions LED ON/OFF.
+This program implements pin PC7 as input connected to a push button, an action will be done when detecting press of the button.
 **/
 void setup();
 
@@ -97,10 +97,10 @@ int main(void){
 	setup();
   82:	0e 94 36 00 	call	0x6c	; 0x6c <setup>
 	while(1) {
-		if(!(PINC & (1 << PINC7))) { //Vérifier si le bouton a été appuyé ,c.à.d PINC7==0
+		if(!(PINC & (1 << PINC7))) { //Check if the button has been pressed, in other words check if PINC7 == 0V
   86:	9f 99       	sbic	0x13, 7	; 19
   88:	fe cf       	rjmp	.-4      	; 0x86 <main+0x4>
-			PORTB ^= (1 << PINB1) | (1 <<PINB0);   // 0b000001100 XOR PORTB pour clignoter les sorties
+			PORTB ^= (1 << PINB1) | (1 <<PINB0);   //To blink 2 pins simultaneously (0b00000011) XOR (PORTB) 
   8a:	98 b3       	in	r25, 0x18	; 24
   8c:	83 e0       	ldi	r24, 0x03	; 3
   8e:	89 27       	eor	r24, r25

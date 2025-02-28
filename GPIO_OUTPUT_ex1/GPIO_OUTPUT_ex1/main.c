@@ -6,34 +6,31 @@
 
 
 /**
-Le programme implémente le bouton PC7, permettant de générer un nombre aléatoire de transitions LED ON/OFF.
+This program implements pin PC7 as input connected to a push button, an action will be done when detecting press of the button.
 **/
 void setup();
 
 int main(void){
 	setup();
 	while(1) {
-		if(!(PINC & (1 << PINC7))) { //Vérifier si le bouton a été appuyé ,c.à.d PINC7==0
-			PORTB ^= (1 << PINB1) | (1 <<PINB0);   // 0b000001100 XOR PORTB pour clignoter les sorties
-			_delay_ms(600);
+		if(!(PINC & (1 << PINC7))) { //Check if the button has been pressed, in other words check if PINC7 == 0V
+			PORTB ^= (1 << PINB1) | (1 <<PINB0);   //To blink 2 pins simultaneously (0b00000011) XOR (PORTB) 
+			_delay_ms(600); //Delay to stabilize button debounce when pressed.
 		}
-	
 	}
 	return 0;
 }
 
 
 /**
-Description : initialisation des registres GPIO en sortie et en entrée
+To initialize GPIO PINs as either INPUT PULL UP or OUTPUT.
 **/
 void setup(){
-	// Initialisation de l'entrée
-	DDRC &= ~(1 << PINC7); // Configurer PINC7 comme entrée
-	PORTC = 0b10000000; // Configurer l'entrée PINC7 en mode PULL-UP (5V sont mis en sortie lorsqu'elle est inactive)
+	//Input
+	DDRC &= ~(1 << PINC7);
+	PORTC = 0b10000000; // Configure PINC7 as input PULL UP (5V if inactive)
 		
-	// Initialisation de la sortie
-	DDRB |= (1 << PINB1) | (1 << PINB0);// Configurer PINB2 et PINB3 comme sorties
-	PORTB &= 0b00000000; // Forcer l'état initial du port à zéro
-	
-
+	//Output
+	DDRB |= (1 << PINB1) | (1 << PINB0);
+	PORTB &= 0b00000000; //Force all output to zero .
 }
