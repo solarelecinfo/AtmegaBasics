@@ -7,7 +7,7 @@
 volatile unsigned char recieved_char='A';
 volatile unsigned char recieved_char_table[4];
 volatile int global_index=0;
-volatile unsigned int value_adc=0;
+volatile uint16_t value_adc=0;
 
 void USART_Init(unsigned int);
 void USART_Transmit(unsigned int data);
@@ -60,16 +60,14 @@ void ADC_Init ()
 	ADCSRA |= (1<<ADPS1)|(1<<ADPS0); //125kHz avec un prescalaire de 8
 	//Activer explicitement  le convertisseur ADC
 	ADCSRA |= (1<<ADEN);
+	
+	// Sélection du pin d'entrée analogique PA1 (ADC1)---explicite
+	ADMUX &= 0xE0;
+	ADMUX |= 0x01;
 }
 
 
 void lecturePinAnalog(void){
-	
-	//selection de pin PCA1
-	// Sélection du pin PC1 (ADC1)
-	ADMUX = (ADMUX & 0xF0) | 0x01;
-	
-
 	//Demande explicite d'une conversion
 	ADCSRA |= ( 1 << ADSC ) ;
 	while ( ADCSRA & (1 << ADSC) ){

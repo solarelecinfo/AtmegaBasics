@@ -3,31 +3,31 @@ ADC_ex2.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         00000204  00000000  00000000  00000074  2**1
+  0 .text         00000208  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         00000000  00800060  00800060  00000278  2**0
+  1 .data         00000000  00800060  00800060  0000027c  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  2 .bss          0000001c  00800060  00800060  00000278  2**0
+  2 .bss          0000001c  00800060  00800060  0000027c  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  00000278  2**0
+  3 .comment      00000030  00000000  00000000  0000027c  2**0
                   CONTENTS, READONLY
-  4 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000002a8  2**2
+  4 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000002ac  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 00000048  00000000  00000000  000002e4  2**0
+  5 .debug_aranges 00000048  00000000  00000000  000002e8  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   0000099c  00000000  00000000  0000032c  2**0
+  6 .debug_info   0000099c  00000000  00000000  00000330  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 000006ef  00000000  00000000  00000cc8  2**0
+  7 .debug_abbrev 000006ef  00000000  00000000  00000ccc  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00000395  00000000  00000000  000013b7  2**0
+  8 .debug_line   0000039b  00000000  00000000  000013bb  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  00000080  00000000  00000000  0000174c  2**2
+  9 .debug_frame  00000080  00000000  00000000  00001758  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00000415  00000000  00000000  000017cc  2**0
+ 10 .debug_str    0000041c  00000000  00000000  000017d8  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00000117  00000000  00000000  00001be1  2**0
+ 11 .debug_loc    00000117  00000000  00000000  00001bf4  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000038  00000000  00000000  00001cf8  2**0
+ 12 .debug_ranges 00000038  00000000  00000000  00001d0b  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -67,7 +67,7 @@ Disassembly of section .text:
   60:	10 e0       	ldi	r17, 0x00	; 0
   62:	a0 e6       	ldi	r26, 0x60	; 96
   64:	b0 e0       	ldi	r27, 0x00	; 0
-  66:	e4 e0       	ldi	r30, 0x04	; 4
+  66:	e8 e0       	ldi	r30, 0x08	; 8
   68:	f2 e0       	ldi	r31, 0x02	; 2
   6a:	02 c0       	rjmp	.+4      	; 0x70 <__do_copy_data+0x10>
   6c:	05 90       	lpm	r0, Z+
@@ -89,8 +89,8 @@ Disassembly of section .text:
   80:	ac 37       	cpi	r26, 0x7C	; 124
   82:	b2 07       	cpc	r27, r18
   84:	e1 f7       	brne	.-8      	; 0x7e <.do_clear_bss_loop>
-  86:	0e 94 90 00 	call	0x120	; 0x120 <main>
-  8a:	0c 94 00 01 	jmp	0x200	; 0x200 <_exit>
+  86:	0e 94 92 00 	call	0x124	; 0x124 <main>
+  8a:	0c 94 02 01 	jmp	0x204	; 0x204 <_exit>
 
 0000008e <__bad_interrupt>:
   8e:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
@@ -123,272 +123,274 @@ void ADC_Init ()
   a6:	86 b1       	in	r24, 0x06	; 6
   a8:	80 68       	ori	r24, 0x80	; 128
   aa:	86 b9       	out	0x06, r24	; 6
-  ac:	08 95       	ret
+	
+	// Sélection du pin d'entrée analogique PA1 (ADC1)---explicite
+	ADMUX &= 0xE0;
+  ac:	87 b1       	in	r24, 0x07	; 7
+  ae:	80 7e       	andi	r24, 0xE0	; 224
+  b0:	87 b9       	out	0x07, r24	; 7
+	ADMUX |= 0x01;
+  b2:	87 b1       	in	r24, 0x07	; 7
+  b4:	81 60       	ori	r24, 0x01	; 1
+  b6:	87 b9       	out	0x07, r24	; 7
+  b8:	08 95       	ret
 
-000000ae <lecturePinAnalog>:
+000000ba <lecturePinAnalog>:
+}
+
 
 void lecturePinAnalog(void){
-	
-	//selection de pin PCA1
-	// Sélection du pin PC1 (ADC1)
-	ADMUX = (ADMUX & 0xF0) | 0x01;
-  ae:	87 b1       	in	r24, 0x07	; 7
-  b0:	80 7f       	andi	r24, 0xF0	; 240
-  b2:	81 60       	ori	r24, 0x01	; 1
-  b4:	87 b9       	out	0x07, r24	; 7
-	
-
 	//Demande explicite d'une conversion
 	ADCSRA |= ( 1 << ADSC ) ;
-  b6:	86 b1       	in	r24, 0x06	; 6
-  b8:	80 64       	ori	r24, 0x40	; 64
-  ba:	86 b9       	out	0x06, r24	; 6
+  ba:	86 b1       	in	r24, 0x06	; 6
+  bc:	80 64       	ori	r24, 0x40	; 64
+  be:	86 b9       	out	0x06, r24	; 6
 	while ( ADCSRA & (1 << ADSC) ){
-  bc:	36 99       	sbic	0x06, 6	; 6
-  be:	fe cf       	rjmp	.-4      	; 0xbc <lecturePinAnalog+0xe>
+  c0:	36 99       	sbic	0x06, 6	; 6
+  c2:	fe cf       	rjmp	.-4      	; 0xc0 <lecturePinAnalog+0x6>
 		//Attendre que la conversion soit fini	
 	}
 	//lire le registre de résultat de conversion
 	uint8_t theLowADC = ADCL;
-  c0:	24 b1       	in	r18, 0x04	; 4
+  c4:	24 b1       	in	r18, 0x04	; 4
 	uint16_t theTenBitResults = ADCH<<8 | theLowADC;
-  c2:	85 b1       	in	r24, 0x05	; 5
-  c4:	90 e0       	ldi	r25, 0x00	; 0
-  c6:	98 2f       	mov	r25, r24
-  c8:	88 27       	eor	r24, r24
-  ca:	82 2b       	or	r24, r18
+  c6:	85 b1       	in	r24, 0x05	; 5
+  c8:	90 e0       	ldi	r25, 0x00	; 0
+  ca:	98 2f       	mov	r25, r24
+  cc:	88 27       	eor	r24, r24
+  ce:	82 2b       	or	r24, r18
 	
 	value_adc=theTenBitResults;
-  cc:	90 93 63 00 	sts	0x0063, r25	; 0x800063 <value_adc+0x1>
-  d0:	80 93 62 00 	sts	0x0062, r24	; 0x800062 <value_adc>
-  d4:	08 95       	ret
+  d0:	90 93 63 00 	sts	0x0063, r25	; 0x800063 <value_adc+0x1>
+  d4:	80 93 62 00 	sts	0x0062, r24	; 0x800062 <value_adc>
+  d8:	08 95       	ret
 
-000000d6 <USART_Init>:
+000000da <USART_Init>:
 /* example, 2400bauds=25                                                                    */
 /************************************************************************/
 void USART_Init (unsigned int baud)
 {
 	//Expliciter l'utilisation du registre UBBRH avant operation d'?criture sur UBBRH
 	UBRRH &= ~(1 << URSEL);
-  d6:	20 b5       	in	r18, 0x20	; 32
-  d8:	2f 77       	andi	r18, 0x7F	; 127
-  da:	20 bd       	out	0x20, r18	; 32
+  da:	20 b5       	in	r18, 0x20	; 32
+  dc:	2f 77       	andi	r18, 0x7F	; 127
+  de:	20 bd       	out	0x20, r18	; 32
 	//Partie MSB du registre HAUT (bits 8 to 11)
 	UBRRH = (unsigned char) (baud >> 8);
-  dc:	90 bd       	out	0x20, r25	; 32
+  e0:	90 bd       	out	0x20, r25	; 32
 	//Partie LSB du registre BAS (bits 0 ? 7)
 	UBRRL = (unsigned char) baud;
-  de:	89 b9       	out	0x09, r24	; 9
+  e2:	89 b9       	out	0x09, r24	; 9
 
 	//Expliciter l'utilisation du registre UCSRC avant operation d'?criture sur UBBRH
 	//Set enable EVEN PARITY
 	//Set 1 stop bits and data bit length is 8-bit
 	UCSRC = (1<<URSEL)| (1<<UPM1)|(3 << UCSZ0);
-  e0:	86 ea       	ldi	r24, 0xA6	; 166
-  e2:	80 bd       	out	0x20, r24	; 32
+  e4:	86 ea       	ldi	r24, 0xA6	; 166
+  e6:	80 bd       	out	0x20, r24	; 32
 
 	//Enable the receiver and transmitter
 	UCSRB =  (1 << TXEN);
-  e4:	88 e0       	ldi	r24, 0x08	; 8
-  e6:	8a b9       	out	0x0a, r24	; 10
-  e8:	08 95       	ret
+  e8:	88 e0       	ldi	r24, 0x08	; 8
+  ea:	8a b9       	out	0x0a, r24	; 10
+  ec:	08 95       	ret
 
-000000ea <USART_Transmit>:
+000000ee <USART_Transmit>:
 
 void USART_Transmit (unsigned int data)
 {
 	//UCSRB &= ~(1 << RXEN); //desactive le recepteur
 	//Wait until the Transmitter is ready
 	while (! (UCSRA & (1 << UDRE)) );
-  ea:	5d 9b       	sbis	0x0b, 5	; 11
-  ec:	fe cf       	rjmp	.-4      	; 0xea <USART_Transmit>
+  ee:	5d 9b       	sbis	0x0b, 5	; 11
+  f0:	fe cf       	rjmp	.-4      	; 0xee <USART_Transmit>
 	//Get that data outa here!
 	UDR = data;
-  ee:	8c b9       	out	0x0c, r24	; 12
+  f2:	8c b9       	out	0x0c, r24	; 12
 	#else
 		//round up by default
 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
 	#endif
 
 	__builtin_avr_delay_cycles(__ticks_dc);
-  f0:	2f e9       	ldi	r18, 0x9F	; 159
-  f2:	86 e8       	ldi	r24, 0x86	; 134
-  f4:	91 e0       	ldi	r25, 0x01	; 1
-  f6:	21 50       	subi	r18, 0x01	; 1
-  f8:	80 40       	sbci	r24, 0x00	; 0
-  fa:	90 40       	sbci	r25, 0x00	; 0
-  fc:	e1 f7       	brne	.-8      	; 0xf6 <USART_Transmit+0xc>
-  fe:	00 c0       	rjmp	.+0      	; 0x100 <USART_Transmit+0x16>
- 100:	00 00       	nop
- 102:	08 95       	ret
+  f4:	2f e9       	ldi	r18, 0x9F	; 159
+  f6:	86 e8       	ldi	r24, 0x86	; 134
+  f8:	91 e0       	ldi	r25, 0x01	; 1
+  fa:	21 50       	subi	r18, 0x01	; 1
+  fc:	80 40       	sbci	r24, 0x00	; 0
+  fe:	90 40       	sbci	r25, 0x00	; 0
+ 100:	e1 f7       	brne	.-8      	; 0xfa <USART_Transmit+0xc>
+ 102:	00 c0       	rjmp	.+0      	; 0x104 <USART_Transmit+0x16>
+ 104:	00 00       	nop
+ 106:	08 95       	ret
 
-00000104 <USART_Transmit_string>:
+00000108 <USART_Transmit_string>:
 
 }
 
 
 void USART_Transmit_string(char *args)
 {
- 104:	cf 93       	push	r28
- 106:	df 93       	push	r29
- 108:	ec 01       	movw	r28, r24
+ 108:	cf 93       	push	r28
+ 10a:	df 93       	push	r29
+ 10c:	ec 01       	movw	r28, r24
     while (*args) {
- 10a:	04 c0       	rjmp	.+8      	; 0x114 <USART_Transmit_string+0x10>
+ 10e:	04 c0       	rjmp	.+8      	; 0x118 <USART_Transmit_string+0x10>
         USART_Transmit(*args++);
- 10c:	21 96       	adiw	r28, 0x01	; 1
- 10e:	90 e0       	ldi	r25, 0x00	; 0
- 110:	0e 94 75 00 	call	0xea	; 0xea <USART_Transmit>
+ 110:	21 96       	adiw	r28, 0x01	; 1
+ 112:	90 e0       	ldi	r25, 0x00	; 0
+ 114:	0e 94 77 00 	call	0xee	; 0xee <USART_Transmit>
 }
 
 
 void USART_Transmit_string(char *args)
 {
     while (*args) {
- 114:	88 81       	ld	r24, Y
- 116:	81 11       	cpse	r24, r1
- 118:	f9 cf       	rjmp	.-14     	; 0x10c <USART_Transmit_string+0x8>
+ 118:	88 81       	ld	r24, Y
+ 11a:	81 11       	cpse	r24, r1
+ 11c:	f9 cf       	rjmp	.-14     	; 0x110 <USART_Transmit_string+0x8>
         USART_Transmit(*args++);
     }
 }
- 11a:	df 91       	pop	r29
- 11c:	cf 91       	pop	r28
- 11e:	08 95       	ret
+ 11e:	df 91       	pop	r29
+ 120:	cf 91       	pop	r28
+ 122:	08 95       	ret
 
-00000120 <main>:
+00000124 <main>:
 
 int main(void)
 {
 
     // initialiser la communication serial
 	USART_Init(25);
- 120:	89 e1       	ldi	r24, 0x19	; 25
- 122:	90 e0       	ldi	r25, 0x00	; 0
- 124:	0e 94 6b 00 	call	0xd6	; 0xd6 <USART_Init>
+ 124:	89 e1       	ldi	r24, 0x19	; 25
+ 126:	90 e0       	ldi	r25, 0x00	; 0
+ 128:	0e 94 6d 00 	call	0xda	; 0xda <USART_Init>
 	ADC_Init();
- 128:	0e 94 49 00 	call	0x92	; 0x92 <ADC_Init>
+ 12c:	0e 94 49 00 	call	0x92	; 0x92 <ADC_Init>
 	 int local_index=0;
 	
     while (1) 
     {
 		USART_Transmit('H');
- 12c:	88 e4       	ldi	r24, 0x48	; 72
- 12e:	90 e0       	ldi	r25, 0x00	; 0
- 130:	0e 94 75 00 	call	0xea	; 0xea <USART_Transmit>
+ 130:	88 e4       	ldi	r24, 0x48	; 72
+ 132:	90 e0       	ldi	r25, 0x00	; 0
+ 134:	0e 94 77 00 	call	0xee	; 0xee <USART_Transmit>
 		USART_Transmit('E');
- 134:	85 e4       	ldi	r24, 0x45	; 69
- 136:	90 e0       	ldi	r25, 0x00	; 0
- 138:	0e 94 75 00 	call	0xea	; 0xea <USART_Transmit>
+ 138:	85 e4       	ldi	r24, 0x45	; 69
+ 13a:	90 e0       	ldi	r25, 0x00	; 0
+ 13c:	0e 94 77 00 	call	0xee	; 0xee <USART_Transmit>
 		USART_Transmit('L');
- 13c:	8c e4       	ldi	r24, 0x4C	; 76
- 13e:	90 e0       	ldi	r25, 0x00	; 0
- 140:	0e 94 75 00 	call	0xea	; 0xea <USART_Transmit>
+ 140:	8c e4       	ldi	r24, 0x4C	; 76
+ 142:	90 e0       	ldi	r25, 0x00	; 0
+ 144:	0e 94 77 00 	call	0xee	; 0xee <USART_Transmit>
 		USART_Transmit('L');
- 144:	8c e4       	ldi	r24, 0x4C	; 76
- 146:	90 e0       	ldi	r25, 0x00	; 0
- 148:	0e 94 75 00 	call	0xea	; 0xea <USART_Transmit>
+ 148:	8c e4       	ldi	r24, 0x4C	; 76
+ 14a:	90 e0       	ldi	r25, 0x00	; 0
+ 14c:	0e 94 77 00 	call	0xee	; 0xee <USART_Transmit>
 		USART_Transmit('A');
- 14c:	81 e4       	ldi	r24, 0x41	; 65
- 14e:	90 e0       	ldi	r25, 0x00	; 0
- 150:	0e 94 75 00 	call	0xea	; 0xea <USART_Transmit>
+ 150:	81 e4       	ldi	r24, 0x41	; 65
+ 152:	90 e0       	ldi	r25, 0x00	; 0
+ 154:	0e 94 77 00 	call	0xee	; 0xee <USART_Transmit>
 		//itoa (counter,buffer,10);
 		//float voltage = (float)value_adc * 5.0f / 1024.0f;
         //dtostrf(voltage, 5, 3, buffer);
 		itoa (value_adc,buffer,10);
- 154:	80 91 62 00 	lds	r24, 0x0062	; 0x800062 <value_adc>
- 158:	90 91 63 00 	lds	r25, 0x0063	; 0x800063 <value_adc+0x1>
+ 158:	80 91 62 00 	lds	r24, 0x0062	; 0x800062 <value_adc>
+ 15c:	90 91 63 00 	lds	r25, 0x0063	; 0x800063 <value_adc+0x1>
     } else if (__radix < 2 || __radix > 36) {
 	*__s = 0;
 	return __s;
     } else {
 	extern char *__itoa_ncheck (int, char *, unsigned char);
 	return __itoa_ncheck (__val, __s, __radix);
- 15c:	4a e0       	ldi	r20, 0x0A	; 10
- 15e:	64 e6       	ldi	r22, 0x64	; 100
- 160:	70 e0       	ldi	r23, 0x00	; 0
- 162:	0e 94 cb 00 	call	0x196	; 0x196 <__itoa_ncheck>
+ 160:	4a e0       	ldi	r20, 0x0A	; 10
+ 162:	64 e6       	ldi	r22, 0x64	; 100
+ 164:	70 e0       	ldi	r23, 0x00	; 0
+ 166:	0e 94 cd 00 	call	0x19a	; 0x19a <__itoa_ncheck>
 		USART_Transmit_string(buffer);
- 166:	84 e6       	ldi	r24, 0x64	; 100
- 168:	90 e0       	ldi	r25, 0x00	; 0
- 16a:	0e 94 82 00 	call	0x104	; 0x104 <USART_Transmit_string>
+ 16a:	84 e6       	ldi	r24, 0x64	; 100
+ 16c:	90 e0       	ldi	r25, 0x00	; 0
+ 16e:	0e 94 84 00 	call	0x108	; 0x108 <USART_Transmit_string>
 		USART_Transmit('\n');
- 16e:	8a e0       	ldi	r24, 0x0A	; 10
- 170:	90 e0       	ldi	r25, 0x00	; 0
- 172:	0e 94 75 00 	call	0xea	; 0xea <USART_Transmit>
+ 172:	8a e0       	ldi	r24, 0x0A	; 10
+ 174:	90 e0       	ldi	r25, 0x00	; 0
+ 176:	0e 94 77 00 	call	0xee	; 0xee <USART_Transmit>
 		USART_Transmit('\r');
- 176:	8d e0       	ldi	r24, 0x0D	; 13
- 178:	90 e0       	ldi	r25, 0x00	; 0
- 17a:	0e 94 75 00 	call	0xea	; 0xea <USART_Transmit>
+ 17a:	8d e0       	ldi	r24, 0x0D	; 13
+ 17c:	90 e0       	ldi	r25, 0x00	; 0
+ 17e:	0e 94 77 00 	call	0xee	; 0xee <USART_Transmit>
 		lecturePinAnalog();
- 17e:	0e 94 57 00 	call	0xae	; 0xae <lecturePinAnalog>
+ 182:	0e 94 5d 00 	call	0xba	; 0xba <lecturePinAnalog>
 		counter+=1;
- 182:	80 91 60 00 	lds	r24, 0x0060	; 0x800060 <__DATA_REGION_ORIGIN__>
- 186:	90 91 61 00 	lds	r25, 0x0061	; 0x800061 <__DATA_REGION_ORIGIN__+0x1>
- 18a:	01 96       	adiw	r24, 0x01	; 1
- 18c:	90 93 61 00 	sts	0x0061, r25	; 0x800061 <__DATA_REGION_ORIGIN__+0x1>
- 190:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <__DATA_REGION_ORIGIN__>
- 194:	cb cf       	rjmp	.-106    	; 0x12c <main+0xc>
+ 186:	80 91 60 00 	lds	r24, 0x0060	; 0x800060 <__DATA_REGION_ORIGIN__>
+ 18a:	90 91 61 00 	lds	r25, 0x0061	; 0x800061 <__DATA_REGION_ORIGIN__+0x1>
+ 18e:	01 96       	adiw	r24, 0x01	; 1
+ 190:	90 93 61 00 	sts	0x0061, r25	; 0x800061 <__DATA_REGION_ORIGIN__+0x1>
+ 194:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <__DATA_REGION_ORIGIN__>
+ 198:	cb cf       	rjmp	.-106    	; 0x130 <main+0xc>
 
-00000196 <__itoa_ncheck>:
- 196:	bb 27       	eor	r27, r27
- 198:	4a 30       	cpi	r20, 0x0A	; 10
- 19a:	31 f4       	brne	.+12     	; 0x1a8 <__itoa_ncheck+0x12>
- 19c:	99 23       	and	r25, r25
- 19e:	22 f4       	brpl	.+8      	; 0x1a8 <__itoa_ncheck+0x12>
- 1a0:	bd e2       	ldi	r27, 0x2D	; 45
- 1a2:	90 95       	com	r25
- 1a4:	81 95       	neg	r24
- 1a6:	9f 4f       	sbci	r25, 0xFF	; 255
- 1a8:	0c 94 d7 00 	jmp	0x1ae	; 0x1ae <__utoa_common>
+0000019a <__itoa_ncheck>:
+ 19a:	bb 27       	eor	r27, r27
+ 19c:	4a 30       	cpi	r20, 0x0A	; 10
+ 19e:	31 f4       	brne	.+12     	; 0x1ac <__itoa_ncheck+0x12>
+ 1a0:	99 23       	and	r25, r25
+ 1a2:	22 f4       	brpl	.+8      	; 0x1ac <__itoa_ncheck+0x12>
+ 1a4:	bd e2       	ldi	r27, 0x2D	; 45
+ 1a6:	90 95       	com	r25
+ 1a8:	81 95       	neg	r24
+ 1aa:	9f 4f       	sbci	r25, 0xFF	; 255
+ 1ac:	0c 94 d9 00 	jmp	0x1b2	; 0x1b2 <__utoa_common>
 
-000001ac <__utoa_ncheck>:
- 1ac:	bb 27       	eor	r27, r27
+000001b0 <__utoa_ncheck>:
+ 1b0:	bb 27       	eor	r27, r27
 
-000001ae <__utoa_common>:
- 1ae:	fb 01       	movw	r30, r22
- 1b0:	55 27       	eor	r21, r21
- 1b2:	aa 27       	eor	r26, r26
- 1b4:	88 0f       	add	r24, r24
- 1b6:	99 1f       	adc	r25, r25
- 1b8:	aa 1f       	adc	r26, r26
- 1ba:	a4 17       	cp	r26, r20
- 1bc:	10 f0       	brcs	.+4      	; 0x1c2 <__utoa_common+0x14>
- 1be:	a4 1b       	sub	r26, r20
- 1c0:	83 95       	inc	r24
- 1c2:	50 51       	subi	r21, 0x10	; 16
- 1c4:	b9 f7       	brne	.-18     	; 0x1b4 <__utoa_common+0x6>
- 1c6:	a0 5d       	subi	r26, 0xD0	; 208
- 1c8:	aa 33       	cpi	r26, 0x3A	; 58
- 1ca:	08 f0       	brcs	.+2      	; 0x1ce <__utoa_common+0x20>
- 1cc:	a9 5d       	subi	r26, 0xD9	; 217
- 1ce:	a1 93       	st	Z+, r26
- 1d0:	00 97       	sbiw	r24, 0x00	; 0
- 1d2:	79 f7       	brne	.-34     	; 0x1b2 <__utoa_common+0x4>
- 1d4:	b1 11       	cpse	r27, r1
- 1d6:	b1 93       	st	Z+, r27
- 1d8:	11 92       	st	Z+, r1
- 1da:	cb 01       	movw	r24, r22
- 1dc:	0c 94 f0 00 	jmp	0x1e0	; 0x1e0 <strrev>
+000001b2 <__utoa_common>:
+ 1b2:	fb 01       	movw	r30, r22
+ 1b4:	55 27       	eor	r21, r21
+ 1b6:	aa 27       	eor	r26, r26
+ 1b8:	88 0f       	add	r24, r24
+ 1ba:	99 1f       	adc	r25, r25
+ 1bc:	aa 1f       	adc	r26, r26
+ 1be:	a4 17       	cp	r26, r20
+ 1c0:	10 f0       	brcs	.+4      	; 0x1c6 <__utoa_common+0x14>
+ 1c2:	a4 1b       	sub	r26, r20
+ 1c4:	83 95       	inc	r24
+ 1c6:	50 51       	subi	r21, 0x10	; 16
+ 1c8:	b9 f7       	brne	.-18     	; 0x1b8 <__utoa_common+0x6>
+ 1ca:	a0 5d       	subi	r26, 0xD0	; 208
+ 1cc:	aa 33       	cpi	r26, 0x3A	; 58
+ 1ce:	08 f0       	brcs	.+2      	; 0x1d2 <__utoa_common+0x20>
+ 1d0:	a9 5d       	subi	r26, 0xD9	; 217
+ 1d2:	a1 93       	st	Z+, r26
+ 1d4:	00 97       	sbiw	r24, 0x00	; 0
+ 1d6:	79 f7       	brne	.-34     	; 0x1b6 <__utoa_common+0x4>
+ 1d8:	b1 11       	cpse	r27, r1
+ 1da:	b1 93       	st	Z+, r27
+ 1dc:	11 92       	st	Z+, r1
+ 1de:	cb 01       	movw	r24, r22
+ 1e0:	0c 94 f2 00 	jmp	0x1e4	; 0x1e4 <strrev>
 
-000001e0 <strrev>:
- 1e0:	dc 01       	movw	r26, r24
- 1e2:	fc 01       	movw	r30, r24
- 1e4:	67 2f       	mov	r22, r23
- 1e6:	71 91       	ld	r23, Z+
- 1e8:	77 23       	and	r23, r23
- 1ea:	e1 f7       	brne	.-8      	; 0x1e4 <strrev+0x4>
- 1ec:	32 97       	sbiw	r30, 0x02	; 2
- 1ee:	04 c0       	rjmp	.+8      	; 0x1f8 <strrev+0x18>
- 1f0:	7c 91       	ld	r23, X
- 1f2:	6d 93       	st	X+, r22
- 1f4:	70 83       	st	Z, r23
- 1f6:	62 91       	ld	r22, -Z
- 1f8:	ae 17       	cp	r26, r30
- 1fa:	bf 07       	cpc	r27, r31
- 1fc:	c8 f3       	brcs	.-14     	; 0x1f0 <strrev+0x10>
- 1fe:	08 95       	ret
+000001e4 <strrev>:
+ 1e4:	dc 01       	movw	r26, r24
+ 1e6:	fc 01       	movw	r30, r24
+ 1e8:	67 2f       	mov	r22, r23
+ 1ea:	71 91       	ld	r23, Z+
+ 1ec:	77 23       	and	r23, r23
+ 1ee:	e1 f7       	brne	.-8      	; 0x1e8 <strrev+0x4>
+ 1f0:	32 97       	sbiw	r30, 0x02	; 2
+ 1f2:	04 c0       	rjmp	.+8      	; 0x1fc <strrev+0x18>
+ 1f4:	7c 91       	ld	r23, X
+ 1f6:	6d 93       	st	X+, r22
+ 1f8:	70 83       	st	Z, r23
+ 1fa:	62 91       	ld	r22, -Z
+ 1fc:	ae 17       	cp	r26, r30
+ 1fe:	bf 07       	cpc	r27, r31
+ 200:	c8 f3       	brcs	.-14     	; 0x1f4 <strrev+0x10>
+ 202:	08 95       	ret
 
-00000200 <_exit>:
- 200:	f8 94       	cli
+00000204 <_exit>:
+ 204:	f8 94       	cli
 
-00000202 <__stop_program>:
- 202:	ff cf       	rjmp	.-2      	; 0x202 <__stop_program>
+00000206 <__stop_program>:
+ 206:	ff cf       	rjmp	.-2      	; 0x206 <__stop_program>
