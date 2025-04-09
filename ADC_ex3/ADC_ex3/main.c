@@ -4,141 +4,106 @@
 #include <avr/interrupt.h>
 #include <stdlib.h>
 
-volatile unsigned char recieved_char='A';
-volatile unsigned char recieved_char_table[4];
-volatile int global_index=0;
-volatile uint16_t value_adc=0;
-
-void USART_Init(unsigned int);
-void USART_Transmit(unsigned int data);
+//Global variables
+volatile uint16_t adcValue=0;
 char buffer[20];
-unsigned int counter=0;
+
+//Prototype function declaration
+void usartInit(unsigned int);
+void usartTransmit(unsigned int data);
+void adcInit(void)
+void readPinAnalog(void)
 
 int main(void)
 {
-
-	// initialiser la communication serial
-	USART_Init(25);
-	ADC_Init();
-	int local_index=0;
-	
+	//Initialize interfaces one time
+	usartInit(25);
+	adcInit();	
+	//Process read on Analog input pin
 	while (1)
 	{
-		USART_Transmit('H');
-		USART_Transmit('E');
-		USART_Transmit('L');
-		USART_Transmit('L');
-		USART_Transmit('A');
-		//itoa (counter,buffer,10);
-		//float voltage = (float)value_adc * 5.0f / 1024.0f;
-		//dtostrf(voltage, 5, 3, buffer);
-		itoa (value_adc,buffer,10);
-		USART_Transmit_string(buffer);
-		USART_Transmit('\n');
-		USART_Transmit('\r');
-		lecturePinAnalog();
-		counter+=1;
-		
-		
+		usartTransmit('V');
+		usartTransmit('A');
+		usartTransmit('L');
+		usartTransmit(':');
+		itoa (adcValue,buffer,10);
+		usartTransmitString(buffer);
+		usartTransmit('\n');
+		usartTransmit('\r');
+		readPinAnalog();	
 	}
 }
 
 /************************************************************************/
-/* Description: permet d'initialiser les registres du module USART en mode asychrone
-/* baud: valeur entier en ?criture sur les deux registres UBBR correspondant ? la vitesse en baud(bits/s)
-/* example, 2400bauds=25                                                                    */
+/*Description:Initialize ADC interface on single conversion mode(Single Analog Input)                                                                  */
 /************************************************************************/
-void ADC_Init ()
+void adcInit()
 {
-//Configurer port en entrée analogique
-DDRC =0x00;
-//Configurer Right-High  MSB du registre de résultat
-ADMUX &= ~(1<<ADLAR);
-//Activer  la reference de voltage en AVCC
-ADMUX |= (1<<REFS0);
-//Configuration frequence selonn intervales 50kHz and 200kHz
-ADCSRA |= (1<<ADPS1)|(1<<ADPS0); //125kHz avec un prescalaire de 8
-//Activer explicitement  le convertisseur ADC
-ADCSRA |= (1<<ADEN);
-
-// Sélection du pin d'entrée analogique PA1 (ADC1)---explicite
-ADMUX &= 0xE0;
-ADMUX |= 0x01;
+	ADMUX &= ~(1<<ADLAR);//set analog conversion to be right adjusted meaning LSB is at right of the result register
+	ADMUX |= (1<<REFS0);//To specify analog reference voltage as AVCC- typically connected to VCC
+	//Configuration frequence selonn intervales 50kHz and 200kHz
+	ADCSRA |= (1<<ADPS1)|(1<<ADPS0); //125kHz avec un prescalaire de 8
+	//Activer explicitement  le convertisseur ADC
+	ADCSRA |= (1<<ADEN);
+	// Sélection du pin d'entrée analogique PA1 (ADC1)---explicite
+	ADMUX &= 0xE0;
+	ADMUX |= 0x01;
 }
-
-
-void lecturePinAnalog(void){
-//Demande explicite d'une conversion
-ADCSRA |= ( 1 << ADSC ) ;
-while ( ADCSRA & (1 << ADSC) ){
-//Attendre que la conversion soit fini
-}
-//lire le registre de résultat de conversion
-uint8_t theLowADC = ADCL;
-uint16_t theTenBitResults = ADCH<<8 | theLowADC;
-
-value_adc=theTenBitResults;
-}
-
-
-
-void conversionVoltage(uint16_t adc_binary_number){
-	//Demande explicite d'une conversion
-	unsigned int voltage=(adc_binary_number*4,85)/1024
-	
-	uint16_t theTenBitResults = ADCH<<8 | theLowADC;
-
-	value_adc=theTenBitResults;
-}
-
-
 
 /************************************************************************/
-/* Description: permet d'initialiser les registres du module USART en mode asychrone
-/* baud: valeur entier en ?criture sur les deux registres UBBR correspondant ? la vitesse en baud(bits/s)
-/* example, 2400bauds=25                                                                    */
+/* Description:Execute punctual conversion on analog input voltage
 /************************************************************************/
-void USART_Init (unsigned int baud)
+void readPinAnalog(){
+	ADCSRA |= ( 1 << ADSC );//Start conversion explicitly
+	while ( ADCSRA & (1 << ADSC) ){} //Wait for conversion to finish
+	//Read ADC result register right adjusted
+	uint8_t lowAdcValue = ADCL;
+	uint16_t tenBitsResult = ADCH<<8 | lowAdcValue;
+	adcValue = tenBitsResult;
+}
+
+/************************************************************************/
+/* Description: Initialize USART asynchronous interface at 2400bauds=25                                                                    */
+/************************************************************************/
+void usartInit (unsigned int baud)
 {
-//Expliciter l'utilisation du registre UBBRH avant operation d'?criture sur UBBRH
-UBRRH &= ~(1 << URSEL);
-//Partie MSB du registre HAUT (bits 8 to 11)
-UBRRH = (unsigned char) (baud >> 8);
-//Partie LSB du registre BAS (bits 0 ? 7)
-UBRRL = (unsigned char) baud;
-
-//Expliciter l'utilisation du registre UCSRC avant operation d'?criture sur UBBRH
-//Set enable EVEN PARITY
-//Set 1 stop bits and data bit length is 8-bit
-UCSRC = (1<<URSEL)| (1<<UPM1)|(3 << UCSZ0);
-
-//Enable the receiver and transmitter
-UCSRB =  (1 << TXEN);
-//Enable ADC interrupt de reception
-//UCSRB |= ( 1 << RXCIE);
-
-//Enable global interrupt
-//sei();
-
+	//Expliciter l'utilisation du registre UBBRH avant operation d'?criture sur UBBRH
+	UBRRH &= ~(1 << URSEL);
+	//Partie MSB du registre HAUT (bits 8 to 11)
+	UBRRH = (unsigned char) (baud >> 8);
+	//Partie LSB du registre BAS (bits 0 ? 7)
+	UBRRL = (unsigned char) baud;
+	//Expliciter l'utilisation du registre UCSRC avant operation d'?criture sur UBBRH
+	//Set enable EVEN PARITY
+	//Set 1 stop bits and data bit length is 8-bit
+	UCSRC = (1<<URSEL)| (1<<UPM1)|(3 << UCSZ0);
+	//Enable the receiver and transmitter
+	UCSRB =  (1 << TXEN);
+	//Enable ADC interrupt de reception
+	//UCSRB |= ( 1 << RXCIE);
+	//Enable global interrupt
+	//sei();
 }
 
 
-void USART_Transmit_string(char *args)
+/************************************************************************/
+/*Description:To send a String of characters via USART interface one character at a time.                                                                 */
+/************************************************************************/
+void usartTransmitString(char *args)
 {
-while (*args) {
-USART_Transmit(*args++);
-}
+	while (*args) {
+		usartTransmit(*args++);
+	}
 }
 
-void USART_Transmit (unsigned int data)
+void usartTransmit (unsigned int data)
 {
-//UCSRB &= ~(1 << RXEN); //desactive le recepteur
-//Wait until the Transmitter is ready
-while (! (UCSRA & (1 << UDRE)) );
-//Get that data outa here!
-UDR = data;
-//UCSRB |= (1 << TXEN);//activer le recepteur
-_delay_ms(500);
+	//UCSRB &= ~(1 << RXEN); //desactive le recepteur
+	//Wait until the Transmitter is ready
+	while (! (UCSRA & (1 << UDRE)) );
+	//Get that data outa here!
+	UDR = data;
+	//UCSRB |= (1 << TXEN);//activer le recepteur
+	_delay_ms(500);
 }
-
 
