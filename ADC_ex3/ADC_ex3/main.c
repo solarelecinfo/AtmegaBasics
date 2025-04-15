@@ -20,7 +20,7 @@ int main(void)
 	//Initialize interfaces one time
 	usartInit(25);
 	adcInit();	
-	//Process read on Analog input pin
+	//Read continuously analog input pin
 	while (1)
 	{
 		usartTransmit('V');
@@ -40,7 +40,7 @@ Description:Initialize ADC interface on single conversion mode(Single Analog Inp
 ************************************************************************************/
 void adcInit()
 {
-	ADMUX &= ~(1<<ADLAR);//set analog conversion to be right adjusted meaning LSB is at right of the result register
+	ADMUX &= ~(1<<ADLAR);//Set analog conversion to be right adjusted meaning LSB is at right of the result register
 	ADMUX |= (1<<REFS0);//To specify analog reference voltage as AVCC- typically connected to VCC
     ADMUX |= 0x01;//Set analog input(ADC1) with no Gain 
 	
@@ -56,7 +56,7 @@ void readPinAnalog(){
 	while ( ADCSRA & (1 << ADSC) ){} //Wait for conversion to finish
 	
 	uint8_t lowAdcValue = ADCL; //Read ADC result register(LSB) right adjusted
-	uint16_t tenBitsResult = ADCH<<8 | lowAdcValue; //Read remaining part(MSB) of ADC result register
+	uint16_t tenBitsResult = ADCH<<8 | lowAdcValue; //Read remaining part(MSB) of ADC result register (must be read last)		
 	adcValue = tenBitsResult; //Result ADC 10 bits ADCH(2)-ADCL(8)
 }
 
