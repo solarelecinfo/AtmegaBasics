@@ -1,0 +1,130 @@
+
+code_TIMER_normal_mode.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000000a6  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  000000fa  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  000000fa  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  0000012c  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000030  00000000  00000000  00000168  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   000005b8  00000000  00000000  00000198  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 0000051c  00000000  00000000  00000750  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   0000020d  00000000  00000000  00000c6c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000044  00000000  00000000  00000e7c  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    00000329  00000000  00000000  00000ec0  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_ranges 00000020  00000000  00000000  000011e9  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   8:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  10:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  14:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  18:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  1c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  20:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  24:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  28:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  2c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  30:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  34:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  38:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  3c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  40:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  44:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  48:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  4c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  50:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d8 e0       	ldi	r29, 0x08	; 8
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+  60:	0e 94 41 00 	call	0x82	; 0x82 <main>
+  64:	0c 94 51 00 	jmp	0xa2	; 0xa2 <_exit>
+
+00000068 <__bad_interrupt>:
+  68:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+0000006c <setupGPIO>:
+}
+
+
+/** Configuration PORTB as OUTPUT **/
+void setupGPIO(){
+	DDRB |= 0x01;
+  6c:	87 b3       	in	r24, 0x17	; 23
+  6e:	81 60       	ori	r24, 0x01	; 1
+  70:	87 bb       	out	0x17, r24	; 23
+	PORTB = 0x00;
+  72:	18 ba       	out	0x18, r1	; 24
+  74:	08 95       	ret
+
+00000076 <setupTimer>:
+}
+
+/**	Configuration of TIMER1 (16Bit) in Nomal mode ,  reset done every 65536 counts **/
+void setupTimer(){
+	TCCR1A = 0x00; //Disable PIN OC1A (toggle ON/OFF).
+  76:	1f bc       	out	0x2f, r1	; 47
+	TCCR1B =0x00; //Set Timer in Normal Mode.
+  78:	1e bc       	out	0x2e, r1	; 46
+	TCCR1B |= (1 << CS11) | (1 << CS10) ; //Config frequency prescaler of timer to 1MHZ/64 = 15625Hz
+  7a:	8e b5       	in	r24, 0x2e	; 46
+  7c:	83 60       	ori	r24, 0x03	; 3
+  7e:	8e bd       	out	0x2e, r24	; 46
+  80:	08 95       	ret
+
+00000082 <main>:
+void setupTimer(void);
+
+/**Example of a 16 Bit timer in Normal mode, Blink LED1 aproximately every 2 second **/
+
+int main(void){
+	setupGPIO();
+  82:	0e 94 36 00 	call	0x6c	; 0x6c <setupGPIO>
+	setupTimer();
+  86:	0e 94 3b 00 	call	0x76	; 0x76 <setupTimer>
+
+	while(1){
+		//Read current value of timer and blink approximately every 2 seconds (half timer period = (2^16)/2 =65536/2 = 32768 counts, equivalent to 2,09 seconds)
+		if ( TCNT1 > 32768){
+  8a:	8c b5       	in	r24, 0x2c	; 44
+  8c:	9d b5       	in	r25, 0x2d	; 45
+  8e:	81 30       	cpi	r24, 0x01	; 1
+  90:	90 48       	sbci	r25, 0x80	; 128
+  92:	28 f0       	brcs	.+10     	; 0x9e <main+0x1c>
+			PORTB ^= 0x01; //LED ON
+  94:	98 b3       	in	r25, 0x18	; 24
+  96:	81 e0       	ldi	r24, 0x01	; 1
+  98:	89 27       	eor	r24, r25
+  9a:	88 bb       	out	0x18, r24	; 24
+  9c:	f6 cf       	rjmp	.-20     	; 0x8a <main+0x8>
+			}else{
+			PORTB = 0x00; //LED OFF
+  9e:	18 ba       	out	0x18, r1	; 24
+  a0:	f4 cf       	rjmp	.-24     	; 0x8a <main+0x8>
+
+000000a2 <_exit>:
+  a2:	f8 94       	cli
+
+000000a4 <__stop_program>:
+  a4:	ff cf       	rjmp	.-2      	; 0xa4 <__stop_program>
