@@ -1,0 +1,85 @@
+#define F_CPU 1000000UL  
+#include <avr/io.h>
+#include <avr/delay.h>
+#include <stdlib.h>
+
+
+
+void USART_Init(unsigned int);
+void USART_Transmit(unsigned int );
+void convert_integer_to_string(int,char *);
+void USART_Transmit_string(char *);
+
+
+
+int main(void)
+{
+unsigned int counter=0;
+char bufferCounter[4]  ;
+    // initialiser la communication serial
+	USART_Init(25);
+    while (1) 
+    {
+		USART_Transmit('H');
+		USART_Transmit('E');
+		USART_Transmit('L');
+		USART_Transmit('L');
+		USART_Transmit('A');
+		convert_integer_to_string(counter,bufferCounter);
+		USART_Transmit_string(bufferCounter);
+		
+		USART_Transmit('\n');
+		USART_Transmit('\r');
+		_delay_ms(500);
+		counter+=1;
+		if(counter>=250){
+			counter=0;
+		}
+    }
+}
+
+/************************************************************************/
+/* Description: permet d'initialiser les registres du module USART en mode asychrone
+/* baud: valeur entier en écriture sur les deux registres UBBR correspondant à la vitesse en baud(bits/s)  
+/* example, 2400bauds=25                                                                    */
+/************************************************************************/
+void USART_Init (unsigned int baud)
+{
+	//Expliciter l'utilisation du registre UBBRH avant operation d'écriture sur UBBRH
+	UBRRH &= ~(1 << URSEL);
+	//Partie MSB du registre HAUT (bits 8 to 11)
+	UBRRH = (unsigned char) (baud >> 8);
+	//Partie LSB du registre BAS (bits 0 à 7)
+	UBRRL = (unsigned char) baud;
+
+	//Enable the receiver and transmitter
+	UCSRB = (1 << RXEN) | (1 << TXEN);
+
+	//Expliciter l'utilisation du registre UCSRC avant operation d'écriture sur UBBRH
+	//Set enable EVEN PARITY
+	//Set 1 stop bits and data bit length is 8-bit
+	UCSRC = (1<<URSEL)| (1<<UPM1)|(3 << UCSZ0);
+}
+
+void USART_Transmit (unsigned int data)
+{
+	//Wait until the Transmitter is ready
+	while (! (UCSRA & (1 << UDRE)) );
+	//Get that data outa here!
+	UDR = data;
+}
+
+void USART_Transmit_string(char *str_value){
+	while(*str_value!= '\0'){
+		USART_Transmit(*str_value);
+		*str_value++;
+	}
+}
+
+void convert_integer_to_string(int counter,char *buffer){
+        itoa(counter, buffer, 10);  // Convert integer to string in base 10
+}
+
+
+
+
